@@ -7,7 +7,7 @@ type Account @entity {
 type Transfer @entity {
   id: ID!
   amount: BigInt!
-  extrinsicHash: String!
+  extrinsicHash: String
   status: Boolean!
   to: Account!
   from: Account!
