@@ -24,10 +24,10 @@ export async function handleTransfer(event: SubstrateEvent): Promise<void> {
     const blockNo = event.block.block.header.number.toNumber();
     const decimals = blockNo >= DOT_REDENOMINATION_BLOCK ?  BigInt("1" + "0".repeat(tokens.DOT.decimals.new)) :  BigInt("1" + "0".repeat(tokens.DOT.decimals.old))
     const transformedAmount = (amount as Balance).toBigInt();
-    const extrinsicHash = event.extrinsic.extrinsic.hash.toString();
+    const extrinsicHash = event.extrinsic?.extrinsic.hash.toString();
     const timestamp = event.extrinsic.block.timestamp;
     const transferInfo = new Transfer(`${blockNo}-${event.idx}`);
-    const isSuccess = event.extrinsic.success;
+    const isSuccess = event.extrinsic ? event.extrinsic.success : true;
 
     await ensureAccounts([from.toString(), to.toString()]);
 
