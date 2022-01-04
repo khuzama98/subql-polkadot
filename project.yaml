@@ -1,17 +1,16 @@
 specVersion: 0.2.0
-name: subql-polkadot-starter
+name: subql-rococo
 version: 1.0.0
 description: ''
 repository: ''
 schema:
   file: ./schema.graphql
 network:
-  genesisHash: '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3'
-  endpoint: wss://rpc.polkadot.io
-  dictionary: https://api.subquery.network/sq/subquery/dictionary-polkadot
+  genesisHash: '0xaaf2cd1b74b5f726895921259421b534124726263982522174147046b8827897'
+  endpoint: wss://rococo-rpc.polkadot.io
 dataSources:
   - kind: substrate/Runtime
-    startBlock: 8024922
+    startBlock: 1
     mapping:
       file: ./dist/index.js
       handlers:
