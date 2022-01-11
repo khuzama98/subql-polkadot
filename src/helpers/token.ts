@@ -17,5 +17,9 @@ export const tokens = {
     SHIBUYA: {
         name: "SBY",
         decimals: 18
+    },
+    SHIDEN: {
+        name: "SDN",
+        decimals: 18
     }
 }

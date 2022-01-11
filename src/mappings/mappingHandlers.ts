@@ -15,13 +15,16 @@ async function ensureAccounts(accountIds: string[]): Promise<void> {
 
 
 export async function handleTransfer(event: SubstrateEvent): Promise<void> {
+    const { SHIDEN: {
+        name, decimals
+    } } = tokens
     const {
         event: {
             data: [from, to, amount],
         },
     } = event;
     const blockNo = event.block.block.header.number.toNumber();
-    const decimals = BigInt("1" + "0".repeat(tokens.SHIBUYA.decimals))
+    const expendedDecimals = BigInt("1" + "0".repeat(decimals))
     const transformedAmount = (amount as Balance).toBigInt();
     const extrinsicHash = event.extrinsic?.extrinsic.hash.toString();
     const timestamp = event.extrinsic.block.timestamp;
@@ -30,14 +33,14 @@ export async function handleTransfer(event: SubstrateEvent): Promise<void> {
 
     await ensureAccounts([from.toString(), to.toString()]);
 
-    transferInfo.token = tokens.SHIBUYA.name;
+    transferInfo.token = name;
     transferInfo.fromId = from.toString();
     transferInfo.toId = to.toString();
     transferInfo.timestamp = timestamp;
     transferInfo.extrinsicHash = extrinsicHash;
     transferInfo.amount = transformedAmount;
     transferInfo.status = isSuccess;
-    transferInfo.decimals = decimals;
-    
+    transferInfo.decimals = expendedDecimals;
+
     await transferInfo.save();
 }

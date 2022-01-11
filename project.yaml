@@ -1,15 +1,13 @@
 specVersion: 0.2.0
-name: subql-dusty
+name: subql-shiden-starter
 version: 1.0.0
 description: ''
 repository: ''
 schema:
   file: ./schema.graphql
 network:
-  genesisHash: '0xddb89973361a170839f80f152d2e9e38a376a5a7eccefcade763f46a8e567019'
-  endpoint: wss://rpc.shibuya.astar.network
-  chaintypes:
-    file: ./types.yaml
+  genesisHash: '0xf1cf9022c7ebb34b162d5b5e34e705a5a740b2d0ecc1009fb89023e62a488108'
+  endpoint: wss://shiden.api.onfinality.io/public-ws
 dataSources:
   - kind: substrate/Runtime
     startBlock: 1
@@ -21,5 +19,3 @@ dataSources:
           filter:
             module: balances
             method: Transfer
-
-# giving error at block 1,412,702 so going to index from next block e.g 1,412,703
