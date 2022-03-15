@@ -12,7 +12,7 @@ network:
     file: ./types.yaml
 dataSources:
   - kind: substrate/Runtime
-    startBlock: 660720
+    startBlock: 1
     mapping:
       file: ./dist/index.js
       handlers:
@@ -21,5 +21,5 @@ dataSources:
           filter:
             module: balances
             method: Transfer
-
-# giving error at block 1,412,702 so going to index from next block e.g 1,412,703
+        - handler: handleFailedTransfers
+          kind: substrate/CallHandler
