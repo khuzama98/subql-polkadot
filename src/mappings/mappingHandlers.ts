@@ -14,16 +14,20 @@ async function ensureAccounts(accountIds: string[]): Promise<void> {
 }
 
 function calculateFees(extrinsic: SubstrateExtrinsic): bigint {
-    const eventRecord = extrinsic.events.find((event) => {
+    let depositFees = BigInt(0);
+    let treasuryFees = BigInt(0);
+
+    const eventRecordWithdraw = extrinsic.events.find((event) => {
         return event.event.method == "Withdraw" && event.event.section == "balances"
     })
 
-    if (eventRecord) {
+    logger.info('records -->' + eventRecordWithdraw)
+    if (eventRecordWithdraw) {
         const {
             event: {
                 data: [accountid, fee]
             }
-        } = eventRecord
+        } = eventRecordWithdraw
 
         const extrinsicSigner = extrinsic.extrinsic.signer.toString()
         const withdrawAccountId = accountid.toString()
@@ -31,9 +35,29 @@ function calculateFees(extrinsic: SubstrateExtrinsic): bigint {
         return extrinsicSigner === withdrawAccountId ? (fee as Balance).toBigInt() : BigInt(0)
     }
 
-    return BigInt(0)
-}
+    const eventRecordDeposit = extrinsic.events.find((event) => {
+        return event.event.method == "Deposit" && event.event.section == "balances"
+    })
 
+    const eventRecordTreasury = extrinsic.events.find((event) => {
+        return event.event.method == "Deposit" && event.event.section == "treasury"
+    })
+
+    if(eventRecordDeposit) {
+        const {event: {data: [, fee]}}= eventRecordDeposit
+
+        depositFees = (fee as Balance).toBigInt()
+    }
+    if(eventRecordTreasury) {
+        const {event: {data: [fee]}}= eventRecordTreasury
+
+        treasuryFees = (fee as Balance).toBigInt()
+    }
+
+    const totalFees = depositFees + treasuryFees
+
+    return totalFees
+}
 
 export async function handleTransfer(event: SubstrateEvent): Promise<void> {
     const {
