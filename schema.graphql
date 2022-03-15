@@ -9,6 +9,7 @@ type Transfer @entity {
   amount: BigInt!
   extrinsicHash: String!
   status: Boolean!
+  fees: BigInt!
   to: Account!
   from: Account!
   token: String!
