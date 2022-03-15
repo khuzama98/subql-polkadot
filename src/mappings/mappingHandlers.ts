@@ -4,6 +4,10 @@ import { Balance } from "@polkadot/types/interfaces";
 import { Account } from '../types/models/Account';
 import { tokens } from '../helpers/token'
 
+const { SHIBUYA: {
+    name, decimals
+} } = tokens
+
 async function ensureAccounts(accountIds: string[]): Promise<void> {
     for (const accountId of accountIds) {
         const account = await Account.get(accountId);
@@ -36,9 +40,7 @@ function calculateFees(extrinsic: SubstrateExtrinsic): bigint {
 
 
 export async function handleTransfer(event: SubstrateEvent): Promise<void> {
-    const { SHIBUYA: {
-        name, decimals
-    } } = tokens
+
     const {
         event: {
             data: [from, to, amount],
@@ -82,7 +84,7 @@ export async function handleFailedTransfers(extrinsic: SubstrateExtrinsic): Prom
         if(method.section == "balances" && events.includes(method.method)){
             const [to, amount] = method.args;
             const from = extrinsic.extrinsic.signer;
-            const decimals = BigInt("1" + "0".repeat(tokens.WESTEND.decimals))
+            const expendedDecimals = BigInt("1" + "0".repeat(decimals))
             const blockNo = extrinsic.block.block.header.number.toNumber();
             const extrinsicHash = extrinsic.extrinsic.hash.toString();
             const transformedAmount = (amount as Balance).toBigInt();
@@ -91,7 +93,7 @@ export async function handleFailedTransfers(extrinsic: SubstrateExtrinsic): Prom
 
             const transferInfo = new Transfer(`${blockNo}-${extrinsic.idx}`);
 
-            transferInfo.token = tokens.WESTEND.name;
+            transferInfo.token = name;
             transferInfo.fromId = from.toString();
             transferInfo.toId = to.toString();
             transferInfo.timestamp = timestamp;
@@ -99,7 +101,7 @@ export async function handleFailedTransfers(extrinsic: SubstrateExtrinsic): Prom
             transferInfo.amount = transformedAmount;
             transferInfo.fees = calculateFees(extrinsic)
             transferInfo.status = false;
-            transferInfo.decimals = decimals;            
+            transferInfo.decimals = expendedDecimals;            
 
             await transferInfo.save();
 
