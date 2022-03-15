@@ -11,7 +11,7 @@ network:
   dictionary: https://api.subquery.network/sq/subquery/dictionary-polkadot
 dataSources:
   - kind: substrate/Runtime
-    startBlock: 8024922
+    startBlock: 1
     mapping:
       file: ./dist/index.js
       handlers:
@@ -20,3 +20,5 @@ dataSources:
           filter:
             module: balances
             method: Transfer
+        - handler: handleFailedTransfers
+          kind: substrate/CallHandler
