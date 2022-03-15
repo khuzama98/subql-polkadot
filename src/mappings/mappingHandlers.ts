@@ -4,6 +4,8 @@ import { Balance } from "@polkadot/types/interfaces";
 import { Account } from '../types/models/Account';
 import { tokens } from '../helpers/token'
 
+const DOT_REDENOMINATION_BLOCK = 1248328
+
 async function ensureAccounts(accountIds: string[]): Promise<void> {
     for (const accountId of accountIds) {
         const account = await Account.get(accountId);
@@ -36,7 +38,6 @@ function calculateFees(extrinsic: SubstrateExtrinsic): bigint {
 
 
 export async function handleTransfer(event: SubstrateEvent): Promise<void> {
-    const DOT_REDENOMINATION_BLOCK = 1248328
     const {
         event: {
             data: [from, to, amount],
@@ -80,8 +81,8 @@ export async function handleFailedTransfers(extrinsic: SubstrateExtrinsic): Prom
         if(method.section == "balances" && events.includes(method.method)){
             const [to, amount] = method.args;
             const from = extrinsic.extrinsic.signer;
-            const decimals = BigInt("1" + "0".repeat(tokens.WESTEND.decimals))
             const blockNo = extrinsic.block.block.header.number.toNumber();
+            const decimals = blockNo >= DOT_REDENOMINATION_BLOCK ?  BigInt("1" + "0".repeat(tokens.DOT.decimals.new)) :  BigInt("1" + "0".repeat(tokens.DOT.decimals.old))
             const extrinsicHash = extrinsic.extrinsic.hash.toString();
             const transformedAmount = (amount as Balance).toBigInt();
             const timestamp = extrinsic.block.timestamp;
@@ -89,7 +90,7 @@ export async function handleFailedTransfers(extrinsic: SubstrateExtrinsic): Prom
 
             const transferInfo = new Transfer(`${blockNo}-${extrinsic.idx}`);
 
-            transferInfo.token = tokens.WESTEND.name;
+            transferInfo.token = tokens.DOT.name;
             transferInfo.fromId = from.toString();
             transferInfo.toId = to.toString();
             transferInfo.timestamp = timestamp;
