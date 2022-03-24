@@ -23,7 +23,6 @@ function calculateFees(extrinsic: SubstrateExtrinsic): bigint {
         return event.event.method == "Withdraw" && event.event.section == "balances"
     })
 
-    logger.info('records -->' + eventRecordWithdraw)
     if (eventRecordWithdraw) {
         const {
             event: {
@@ -68,11 +67,12 @@ export async function handleTransfer(event: SubstrateEvent): Promise<void> {
             data: [from, to, amount],
         },
     } = event;
+    
     const blockNo = event.block.block.header.number.toNumber();
     const decimals = blockNo >= DOT_REDENOMINATION_BLOCK ?  BigInt("1" + "0".repeat(tokens.DOT.decimals.new)) :  BigInt("1" + "0".repeat(tokens.DOT.decimals.old))
     const transformedAmount = (amount as Balance).toBigInt();
     const extrinsicHash = event.extrinsic?.extrinsic.hash.toString();
-    const timestamp = event.extrinsic.block.timestamp;
+    const timestamp = event.extrinsic ? event.extrinsic.block.timestamp : new Date();
     const transferInfo = new Transfer(`${blockNo}-${event.idx}`);
     const isSuccess = event.extrinsic ? event.extrinsic.success : false;
 
